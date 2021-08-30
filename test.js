@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const directory = process.argv[2];
-const ext = "." + process.argv[3];
+const ext = process.argv[3];
 
 // console.log(directory)
 // console.log(ext)

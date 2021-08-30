@@ -10,25 +10,19 @@ file extension to filter by as the second argument.
 https://www.geeksforgeeks.org/node-js-fs-readdir-method/
 
 ```javascript
-// Node.js program to demonstrate the
-// fs.readdir() method
+var fs = require('fs')
+var path = require('path')
 
-// Import the filesystem module
-const fs = require('fs');
-const path = require('path');
+var folder = process.argv[2]
+var ext = '.' + process.argv[3]
 
-// Function to get current filenames
-// in directory with specific extension
-fs.readdir(__dirname, (err, files) => {
-if (err)
-	console.log(err);
-else {
-	console.log("\Filenames with the .txt extension:");
-	files.forEach(file => {
-	if (path.extname(file) == ".txt")
-		console.log(file);
-	})
-}
+fs.readdir(folder, function (err, files) {
+  if (err) return console.error(err)
+  files.forEach(function(file) {
+      if (path.extname(file) === ext) {
+          console.log(file)
+      }
+  })
 })
 
 ```
