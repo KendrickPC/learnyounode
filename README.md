@@ -1,83 +1,66 @@
-## TIME SERVER (Exercise 10 of 13)  
+## HTTP JSON API SERVER (Exercise 13 of 13)  
    
-  Create a file named time-server.js.  
+  Create a file named http-json-api-server.js.  
    
-  Write a TCP time server!  
+  Write an HTTP server that serves JSON data when it receives a GET request  
+  to the path '/api/parsetime'. Expect the request to contain a query string  
+  with a key 'iso' and an ISO-format time as the value.  
    
-  Your server should listen to TCP connections on the port provided by the  
-  first argument to your program. For each connection you must write the  
-  current date & 24 hour time in the format:  
+  For example:  
    
-     "YYYY-MM-DD hh:mm"  
+  /api/parsetime?iso=2013-08-10T12:10:15.474Z  
    
-  followed by a newline character. Month, day, hour and minute must be  
-  zero-filled to 2 integers. For example:  
+  The JSON response should contain only 'hour', 'minute' and 'second'  
+  properties. For example:  
    
-     "2013-07-06 17:42"  
+     {  
+       "hour": 14,  
+       "minute": 23,  
+       "second": 15  
+     }  
    
-  After sending the string, close the connection.  
+  Add second endpoint for the path '/api/unixtime' which accepts the same  
+  query string but returns UNIX epoch time in milliseconds (the number of  
+  milliseconds since 1 Jan 1970 00:00:00 UTC) under the property 'unixtime'.  
+  For example:  
+   
+     { "unixtime": 1376136615474 }  
+   
+  Your server should listen on the port provided by the first argument to  
+  your program.  
    
  ─────────────────────────────────────────────────────────────────────────────  
    
  ## HINTS  
    
-  For this exercise we'll be creating a raw TCP server. There's no HTTP  
-  involved here so we need to use the net module from Node core which has  
-  all the basic networking functions.  
+  The request object from an HTTP server has a url property that you will  
+  need to use to "route" your requests for the two endpoints.  
    
-  The net module has a method named net.createServer() that takes a  
-  function. The function that you need to pass to net.createServer() is a  
-  connection listener that is called more than once. Every connection  
-  received by your server triggers another call to the listener. The  
-  listener function has the signature:  
+  You can parse the URL and query string using the Node core 'url' module.  
+  new URL(request.url) will parse content of request.url and provide you  
+  with an object with helpful properties.  
    
-     function listener (socket) { /* ... */ }  
+  For example, on the command prompt, type:  
    
-  net.createServer() also returns an instance of your server. You must call  
-  server.listen(portNumber) to start listening on a particular port.  
+     $ node -pe "new URL('/test?q=1', 'http://example.com')"  
    
-  A typical Node TCP server looks like this:  
+  Documentation on the url module can be found by pointing your browser  
+  here: file:///usr/local/lib/node_modules/learnyounode/docs-nodejs/url.html  
    
-     const net = require('net')  
-     const server = net.createServer(function (socket) {  
-       // socket handling logic  
-     })  
-     server.listen(8000)  
+  Your response should be in a JSON string format. Look at JSON.stringify()  
+  for more information.  
    
-  Remember to use the port number supplied to you as the first command-line  
-  argument.  
+  You should also be a good web citizen and set the Content-Type properly:  
    
-  The socket object contains a lot of meta-data regarding the connection,  
-  but it is also a Node duplex Stream, in that it can be both read from, and  
-  written to. For this exercise we only need to write data and then close  
-  the socket.  
+     res.writeHead(200, { 'Content-Type': 'application/json' })  
    
-  Use socket.write(data) to write data to the socket and socket.end() to  
-  close the socket. Alternatively, the .end() method also takes a data  
-  object so you can simplify to just: socket.end(data).  
-   
-  Documentation on the net module can be found by pointing your browser  
-  here:  
-   
-  file:///usr/local/lib/node_modules/learnyounode/docs-nodejs/net.html  
-   
-  To create the date, you'll need to create a custom format from a new  
-  Date() object. The methods that will be useful are:  
-   
-     date.getFullYear()  
-     date.getMonth() // starts at 0  
-     date.getDate() // returns the day of month  
-     date.getHours()  
-     date.getMinutes()  
-   
-  Or, if you want to be adventurous, use the strftime package from npm. The  
-  strftime(fmt, date) function takes date formats just like the unix date  
-  command. You can read more about strftime at:  
-  (https://github.com/samsonjs/strftime)  
+  The JavaScript Date object can print dates in ISO format, e.g. new  
+  Date().toISOString(). It can also parse this format if you pass the string  
+  into the Date constructor. Date.getTime() will also come in handy.  
    
   Check to see if your program is correct by running this command:  
    
-     $ learnyounode verify time-server.js  
+     $ learnyounode verify http-json-api-server.js  
    
  ─────────────────────────────────────────────────────────────────────────────  
    
@@ -85,4 +68,4 @@
    » To execute your program in a test environment, run: learnyounode run                                                                            
      program.js                                                                  
    » To verify your program, run: learnyounode verify program.js                 
-   » For help run: learnyounode help                       
+   » For help run: learnyounode help      
